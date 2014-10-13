@@ -1,4 +1,4 @@
-package com.mawujun.plusins.geolocation;
+package com.mawujun.plusins.baiduLocation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,9 +16,10 @@ import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
+import com.baidu.location.LocationClientOption.LocationMode;
 
 
-public class Geolocation  extends CordovaPlugin {
+public class BaiduLocation  extends CordovaPlugin {
 	private static final String STOP_ACTION = "stop";
 	private static final String GET_ACTION = "getCurrentPosition";
 	public LocationClient locationClient = null;
@@ -60,15 +61,20 @@ public class Geolocation  extends CordovaPlugin {
 				@Override
 				public void run() {
 					locationClient = new LocationClient(cordova.getActivity());
-					locationClient.setAK("BfkPvjDGHC0ATZhIr6wxnHh9");//设置百度的ak
 					myListener = new MyLocationListener();
 					locationClient.registerLocationListener(myListener);
 					LocationClientOption option = new LocationClientOption();
 					option.setOpenGps(true);
+					option.setLocationMode(LocationMode.Hight_Accuracy);//设置定位模式
 					option.setCoorType("bd09ll");// 返回的定位结果是百度经纬度，默认值gcj02
 					option.setProdName("BaiduLoc");
-					option.disableCache(true);// 禁止启用缓存定位
 					locationClient.setLocOption(option);
+					
+//					option.setCoorType("bd09ll");//返回的定位结果是百度经纬度,默认值gcj02
+//					option.setScanSpan(5000);//设置发起定位请求的间隔时间为5000ms,不用定时，通过自己在js中定时请求，来获取定时
+//					option.setIsNeedAddress(true);//返回的定位结果包含地址信息
+//					option.setNeedDeviceDirect(true);//返回的定位结果包含手机机头的方向
+					
 
 					locationClient.start();
 					locationClient.requestLocation();
@@ -82,8 +88,7 @@ public class Geolocation  extends CordovaPlugin {
 			callbackContext.success(200);
 			return true;
 		} else {
-			callbackContext
-					.error(PluginResult.Status.INVALID_ACTION.toString());
+			callbackContext.error(PluginResult.Status.INVALID_ACTION.toString());
 		}
 
 		while (result == false) {
