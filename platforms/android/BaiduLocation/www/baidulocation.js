@@ -1,6 +1,10 @@
-window.locationService = {
-	execute: function(action, successCallback, errorCallback) {
-		cordova.exec(    
+//var cordova = require('cordova');
+
+function BaiduLocation() {
+
+}
+BaiduLocation.prototype.execute=function(action, successCallback, errorCallback) {
+		cordova.exec(     
 			function(pos) {
 				var errcode = pos.code;
 				if (errcode == 61 || errcode == 65 || errcode == 161) {
@@ -19,12 +23,13 @@ window.locationService = {
 			action,
 			[]
 		)
-	},
-	getCurrentPosition: function(successCallback, errorCallback) {
+};
+
+BaiduLocation.prototype.getCurrentPosition=function(successCallback, errorCallback) {
 		this.execute("getCurrentPosition", successCallback, errorCallback);
-	},
-	stop: function(action, successCallback, errorCallback) {
+};
+BaiduLocation.prototype.stop= function(action, successCallback, errorCallback) {
 		this.execute("stop", successCallback, errorCallback);
-	}
 }
-module.exports = locationService;
+var baiduLocation=new BaiduLocation();
+module.exports = baiduLocation;
