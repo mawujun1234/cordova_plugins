@@ -17,11 +17,11 @@ import android.net.Uri;
 
 public class BarcodeScanner_intent extends CordovaPlugin {
 	/**
-	 * À©Õ¹¶şÎ¬ÂëÉ¨ÃèµÄphonegapÀàÊµÏÖ
-	 * ÊµÏÖÔ­ÀíÈçÏÂ£º
-	 *    1.Ê¹ÓÃphonegapµÄjsÀà¿âÊµÏÖÍ¨¹ı²å¼şµ÷ÓÃÏà¹ØµÄPlugin javaÀà¡£
-	 *    2.pluginµ÷ÓÃzxingÏà¹ØµÄ¶şÎ¬ÂëÉ¨ÂëµÄ·½·¨ÊµÏÖ¡£
-	 *    3.Èç¹ûµ÷ÓÃzxingÃ»ÓĞ°²×°£¬µ½googleÏÂÔØÏà¹ØµÄzxing apk°²×°£¬²¢µ÷ÓÃ¶ÔÓ¦µÄintentÊµÏÖ¡£
+	 * æ‰©å±•äºŒç»´ç æ‰«æçš„phonegapç±»å®ç°
+	 * å®ç°åŸç†å¦‚ä¸‹ï¼š
+	 *    1.ä½¿ç”¨phonegapçš„jsç±»åº“å®ç°é€šè¿‡æ’ä»¶è°ƒç”¨ç›¸å…³çš„Plugin javaç±»ã€‚
+	 *    2.pluginè°ƒç”¨zxingç›¸å…³çš„äºŒç»´ç æ‰«ç çš„æ–¹æ³•å®ç°ã€‚
+	 *    3.å¦‚æœè°ƒç”¨zxingæ²¡æœ‰å®‰è£…ï¼Œåˆ°googleä¸‹è½½ç›¸å…³çš„zxing apkå®‰è£…ï¼Œå¹¶è°ƒç”¨å¯¹åº”çš„intentå®ç°ã€‚
 	 * 
 	 * This calls out to the ZXing barcode reader and returns the result.
 	 */
@@ -43,7 +43,7 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 
 		/**
 		 * 
-		 * ÓÃÓÚpluginÏà¹ØµÄ·½·¨£¬ÓÃÓÚ±©Â¶Ïà¹ØµÄ·½·¨Ê¹ÓÃ¡£
+		 * ç”¨äºpluginç›¸å…³çš„æ–¹æ³•ï¼Œç”¨äºæš´éœ²ç›¸å…³çš„æ–¹æ³•ä½¿ç”¨ã€‚
 		 * 
 		 * Executes the request and returns PluginResult.
 		 *
@@ -148,9 +148,9 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 
 
 		/**
-		 * É¨Ãè¶şÎ¬ÂëµÄ·½·¨
-		 *    ±¸×¢£ºÔÚÉ¨Ãè¶şÎ¬ÂëµÄÀàĞÍ×îºÃ²»ºÃÉèÖÃ£¬ÔÚÇ°ÆÚµÄzxing¿ÉÄÜĞèÒª£¬ÔÚºóÆÚµÄ°æ±¾ÖĞ²»ĞèÒª£¬
-		 *    zxing»á×Ô¶¯¼ìË÷¶şÎ¬ÂëµÄÀàĞÍ£¬²¢Ê¶±ğÏà¹Ø¶şÎ¬Âë¡£
+		 * æ‰«æäºŒç»´ç çš„æ–¹æ³•
+		 *    å¤‡æ³¨ï¼šåœ¨æ‰«æäºŒç»´ç çš„ç±»å‹æœ€å¥½ä¸å¥½è®¾ç½®ï¼Œåœ¨å‰æœŸçš„zxingå¯èƒ½éœ€è¦ï¼Œåœ¨åæœŸçš„ç‰ˆæœ¬ä¸­ä¸éœ€è¦ï¼Œ
+		 *    zxingä¼šè‡ªåŠ¨æ£€ç´¢äºŒç»´ç çš„ç±»å‹ï¼Œå¹¶è¯†åˆ«ç›¸å…³äºŒç»´ç ã€‚
 		 *    
 		 * Initiates a barcode scan. If the ZXing scanner isn't installed, the user
 		 * will be prompted to install it.
@@ -165,7 +165,7 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 		    intentScan.addCategory(Intent.CATEGORY_DEFAULT);
 		    //intentScan.
 
-		    //ÉèÖÃÉ¨ÃèÌØ¶¨ÀàĞÍµÄ¶şÎ¬Âë
+		    //è®¾ç½®æ‰«æç‰¹å®šç±»å‹çš„äºŒç»´ç 
 		    //if (barcodeFormats != null) {
 		    //      Tell the scanner what types we're after
 		    //			intentScan.putExtra("SCAN_FORMATS", barcodeFormats);
@@ -179,7 +179,7 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 		}
 
 	    /**
-	     * ÓÃÓÚ»ñÈ¡¶şÎ¬ÂëÉ¨ÃèÖ®ºó»ñÈ¡Ïà¹ØµÄ¶şÎ¬ÂëÏà¹ØµÄĞÅÏ¢
+	     * ç”¨äºè·å–äºŒç»´ç æ‰«æä¹‹åè·å–ç›¸å…³çš„äºŒç»´ç ç›¸å…³çš„ä¿¡æ¯
 	     * Called when the barcode scanner exits
 	     *
 	     * @param requestCode		The request code originally supplied to startActivityForResult(),
@@ -188,7 +188,7 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 	     * @param intent			An Intent, which can return result data to the caller (various data can be attached to Intent "extras").
 	     */
 		public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-			//ÕâÊÇËùÓĞ¿ÉÄÜµÄÖµ
+			//è¿™æ˜¯æ‰€æœ‰å¯èƒ½çš„å€¼
 //			String contents = intent.getStringExtra("SCAN_RESULT");
 //	        String formatName = intent.getStringExtra("SCAN_RESULT_FORMAT");
 //	        byte[] rawBytes = intent.getByteArrayExtra("SCAN_RESULT_BYTES");
@@ -201,8 +201,8 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 				if (resultCode == Activity.RESULT_OK) {
 					String contents = intent.getStringExtra("SCAN_RESULT");
 					String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-					//this.success(new PluginResult(PluginResult.Status.OK, " ÌõĞÎÂëÎª:"+contents+" ÌõÂëÀàĞÍÎª: "+format), this.callback);
-					this.callbackContext.success(" ÌõĞÎÂëÎª:"+contents+" ÌõÂëÀàĞÍÎª: "+format);
+					//this.success(new PluginResult(PluginResult.Status.OK, " æ¡å½¢ç ä¸º:"+contents+" æ¡ç ç±»å‹ä¸º: "+format), this.callback);
+					this.callbackContext.success(" æ¡å½¢ç ä¸º:"+contents+" æ¡ç ç±»å‹ä¸º: "+format);
 				} else {
 					//this.error(new PluginResult(PluginResult.Status.ERROR), this.callback);
 					this.callbackContext.error(PluginResult.MESSAGE_TYPE_STRING);
@@ -211,8 +211,8 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 		}
 
 		/**
-		 * ´´½¨Ïà¹ØµÄ¶Ô»°¿ò£¬ÔÚÍ¨¹ıÃ»ÓĞ°²×°Ïà¹ØµÄzxing¿ªÔ´×é¼şÊ±ºò£¬µ÷ÓÃÔ¶³ÌµÄintent»òÕßÏÂÔØÏà¹ØÖ´ĞĞÀàÊµÏÖÏà¹ØµÄ
-		 * ¹¦ÄÜ
+		 * åˆ›å»ºç›¸å…³çš„å¯¹è¯æ¡†ï¼Œåœ¨é€šè¿‡æ²¡æœ‰å®‰è£…ç›¸å…³çš„zxingå¼€æºç»„ä»¶æ—¶å€™ï¼Œè°ƒç”¨è¿œç¨‹çš„intentæˆ–è€…ä¸‹è½½ç›¸å…³æ‰§è¡Œç±»å®ç°ç›¸å…³çš„
+		 * åŠŸèƒ½
 		 * @param title
 		 * @param message
 		 * @param yesString
@@ -231,7 +231,7 @@ public class BarcodeScanner_intent extends CordovaPlugin {
 						public void onClick(DialogInterface dlg, int i) {
 							dlg.dismiss();
 
-							//ÒÔºó»»³É±¾µØµÄapk
+							//ä»¥åæ¢æˆæœ¬åœ°çš„apk
 							Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse("https://github.com/zxing/zxing/releases"));
 							//Uri uri = Uri.parse("market://details?id=" + packageName);
 						    //Intent intent = new Intent(Intent.ACTION_VIEW, uri);
