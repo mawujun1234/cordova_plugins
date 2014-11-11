@@ -247,7 +247,7 @@ public class UpdateApp extends CordovaPlugin {
 			httpConnection = (HttpURLConnection) url.openConnection();
 			//httpConnection.setDoInput(true);
 			//httpConnection.setDoOutput(true);
-			//httpConnection.setRequestMethod("GET");
+			httpConnection.setRequestMethod("GET");
 			//exceptionDialog("0");
 			//httpConnection.connect();
 			sdfsd,放到logcat中试下，调试下看问题出在哪里
@@ -255,6 +255,7 @@ public class UpdateApp extends CordovaPlugin {
 			httpConnection.setConnectTimeout(6*1000);
 			if (httpConnection.getResponseCode() != 200) {
 				exceptionDialog("http连接失败!");
+				return false;
 			}
 			exceptionDialog("11");
 			reader = new InputStreamReader(httpConnection.getInputStream());
