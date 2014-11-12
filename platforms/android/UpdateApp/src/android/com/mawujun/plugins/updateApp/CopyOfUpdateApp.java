@@ -39,11 +39,10 @@ import android.util.Log;
 /**
  * 程序更新的app插件
  * version.js的内容如下{verCode:2,verName:"0.0.2",url:"http://172.16.3.10:8080/emsmobile-debug-unaligned.apk"}
- * 但是如果在客户端请求的参数中加了downloadFile的值，那就以参数的为优先级
  * @author mawujun
  * 
  */
-public class UpdateApp extends CordovaPlugin {
+public class CopyOfUpdateApp extends CordovaPlugin {
 	public CallbackContext callbackContext;
 	int newVerCode = -1;// 新版本号，服务端的版本号
 	String newVerName = "";//新版本名称，服务端的版本名称
@@ -60,7 +59,7 @@ public class UpdateApp extends CordovaPlugin {
 		initUrl(args);
 		this.callbackContext = callbackContext;
 		activity = this.cordova.getActivity();
-		final UpdateApp aa=this;
+		final CopyOfUpdateApp aa=this;
 		
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()       
         .detectDiskReads()       
@@ -106,7 +105,7 @@ public class UpdateApp extends CordovaPlugin {
 		if(params==null){
 			exceptionDialog("请输入地址参数");
 		}
-		downloadFile=params.getString("downloadFile");
+//		downloadFile=params.getString("downloadFile");
 //		if(downloadFile==null){
 //			exceptionDialog("请输入文件下载地址参数:downloadFile");
 //		}
@@ -248,10 +247,7 @@ public class UpdateApp extends CordovaPlugin {
 			JSONObject jsonObj = new JSONObject(json);
 			newVerCode = Integer.parseInt(jsonObj.getString("verCode"));
 			newVerName = jsonObj.getString("verName");
-			if(downloadFile==null || "".equals(downloadFile)){
-				downloadFile= jsonObj.getString("downloadFile");
-			}
-			
+			downloadFile= jsonObj.getString("downloadFile");
 			//exceptionDialog(newVerCode+"=="+newVerName);
 		} catch (Exception e) {
 			exceptionDialog(e.getMessage());
@@ -316,12 +312,12 @@ public class UpdateApp extends CordovaPlugin {
 		StringBuffer sb = new StringBuffer();
 		sb.append("当前版本：");
 		sb.append(verName);
-		//sb.append(" Code:");
-		//sb.append(verCode);
+		sb.append(" Code:");
+		sb.append(verCode);
 		sb.append(",发现版本：");
 		sb.append(newVerName);
-		//sb.append(" Code:");
-		//sb.append(newVerCode);
+		sb.append(" Code:");
+		sb.append(newVerCode);
 		sb.append(",是否更新");
 		Dialog dialog = new AlertDialog.Builder(this.cordova.getActivity())
 				.setTitle("软件更新")
@@ -361,8 +357,6 @@ public class UpdateApp extends CordovaPlugin {
 		pd.show();
 //		new Thread() {
 //			public void run() {
-		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))  
-        {  
 				HttpClient client = new DefaultHttpClient();
 				HttpGet get = new HttpGet(url);
 				HttpResponse response;
@@ -381,10 +375,9 @@ public class UpdateApp extends CordovaPlugin {
 					
 					if (is != null) {
 						File file = new File(
-								//Environment.getDownloadCacheDirectory(),
-								Environment.getExternalStorageDirectory(),
+								Environment.getDownloadCacheDirectory(),//Environment.getExternalStorageDirectory(),
 								UPDATE_SERVERAPK);
-						//exceptionDialog(file.canWrite()+"");
+						exceptionDialog(file.canWrite()+"");
 						//应该是没有写入权限造成的
 						//http://www.cnblogs.com/mengdd/p/3742623.html
 						fileOutputStream = new FileOutputStream(file);
@@ -396,22 +389,18 @@ public class UpdateApp extends CordovaPlugin {
 							count += charb;
 						}
 					}
-					//exceptionDialog("-111");
+					exceptionDialog("-111");
 					fileOutputStream.flush();
 					if (fileOutputStream != null) {
 						fileOutputStream.close();
 					}
-					//exceptionDialog("000");
+					exceptionDialog("000");
 					down();
-					//exceptionDialog("333");
+					exceptionDialog("333");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-        } else {
-        	exceptionDialog("SD卡不具有读写权限");
-        	pd.cancel();
-        }
 //			}
 //		}.start();
 	}
@@ -423,7 +412,7 @@ public class UpdateApp extends CordovaPlugin {
 
 			super.handleMessage(msg);
 			pd.cancel();
-			//exceptionDialog("111");
+			exceptionDialog("111");
 			update();
 		}
 	};
@@ -444,7 +433,7 @@ public class UpdateApp extends CordovaPlugin {
 	 * 安装应用
 	 */
 	public void update() {
-		//exceptionDialog("2222");
+		exceptionDialog("2222");
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.fromFile(new File(Environment
 				.getExternalStorageDirectory(), UPDATE_SERVERAPK)),
