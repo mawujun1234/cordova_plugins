@@ -242,17 +242,17 @@ public class UpdateApp extends CordovaPlugin {
 				strBuffer.append(line);
 			}
 			String json =strBuffer.toString();
-			//exceptionDialog(json);
+			exceptionDialog(json);
 			//JSONArray array = new JSONArray(json);
 			//JSONObject jsonObj = array.getJSONObject(0);
 			JSONObject jsonObj = new JSONObject(json);
 			newVerCode = Integer.parseInt(jsonObj.getString("verCode"));
 			newVerName = jsonObj.getString("verName");
-			if(downloadFile==null || "".equals(downloadFile)){
+			if(downloadFile==null || "".equals(downloadFile.trim())){
 				downloadFile= jsonObj.getString("downloadFile");
 			}
 			
-			//exceptionDialog(newVerCode+"=="+newVerName);
+			exceptionDialog(newVerCode+"=="+newVerName);
 		} catch (Exception e) {
 			exceptionDialog(e.getMessage());
 			// TODO Auto-generated catch block
@@ -337,6 +337,7 @@ public class UpdateApp extends CordovaPlugin {
 						pd.setCancelable(true);// 设置是否可以通过点击Back键取消  
 						pd.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条  
 						pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+						pd.show();
 						downFile(downloadFile);
 					}
 				})
@@ -358,7 +359,7 @@ public class UpdateApp extends CordovaPlugin {
 	 * 下载apk
 	 */
 	public void downFile(final String url) {
-		pd.show();
+		
 //		new Thread() {
 //			public void run() {
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))  
