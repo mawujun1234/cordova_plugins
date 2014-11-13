@@ -37,8 +37,10 @@ import android.os.StrictMode;
 import android.util.Log;
 
 /**
+ * 可以正常使用，但阻塞了主线程,但版本检测时间很长的话，会出现白板
  * 程序更新的app插件
  * version.js的内容如下{verCode:2,verName:"0.0.2",url:"http://172.16.3.10:8080/emsmobile-debug-unaligned.apk"}
+ * 但是如果在客户端请求的参数中加了downloadFile的值，那就以参数的为优先级
  * @author mawujun
  * 
  */
@@ -60,7 +62,6 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 		this.callbackContext = callbackContext;
 		activity = this.cordova.getActivity();
 		final CopyOfUpdateApp aa=this;
-		
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()       
         .detectDiskReads()       
         .detectDiskWrites()       
@@ -93,6 +94,12 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 			callbackContext.success();
 			return true;
 		} else if("autoUpdateApp".equals(action)){
+//			cordova.getThreadPool().execute(new Runnable() {
+//                public void run() {
+//                	aa.autoUpdateApp();
+//                	callbackContext.success();
+//                }
+//			});
 			this.autoUpdateApp();
 			callbackContext.success();
 			return true;
@@ -101,11 +108,18 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 	}
 
 	public void initUrl(JSONArray args) throws JSONException{
-		JSONObject params=args.optJSONObject(0);
+		
+		JSONObject params=args.getJSONObject(0);
+		
 		if(params==null){
 			exceptionDialog("请输入地址参数");
 		}
-//		downloadFile=params.getString("downloadFile");
+		try{
+			downloadFile=params.getString("downloadFile");
+		}catch(Exception e) {//如果值不存在，会爆出异常
+			downloadFile=null;
+		}
+//		exceptionDialog(downloadFile+"");
 //		if(downloadFile==null){
 //			exceptionDialog("请输入文件下载地址参数:downloadFile");
 //		}
@@ -139,6 +153,7 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 	 */
 	public void autoUpdateApp() {
 		// this.cordova.getActivity();
+		
 		if (getServerVer()) {
 			int verCode = this.getVerCode();
 			if (newVerCode > verCode) {
@@ -215,7 +230,6 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 		BufferedReader bReader =null;
 		try {
 			URL url = new URL(serverVerUrl);
-			
 			httpConnection = (HttpURLConnection) url.openConnection();
 			//httpConnection.setDoInput(true);
 			//httpConnection.setDoOutput(true);
@@ -224,7 +238,7 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 			//httpConnection.connect();
 			//sdfsd,放到logcat中试下，调试下看问题出在哪里
 			//通过android的日志系统记录然后，再在logcat中看下
-			httpConnection.setConnectTimeout(6*1000);
+			//httpConnection.setConnectTimeout(6*1000);
 			if (httpConnection.getResponseCode() != 200) {
 				exceptionDialog("http连接失败!");
 				return false;
@@ -241,14 +255,16 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 				strBuffer.append(line);
 			}
 			String json =strBuffer.toString();
-			//exceptionDialog(json);
+
 			//JSONArray array = new JSONArray(json);
 			//JSONObject jsonObj = array.getJSONObject(0);
 			JSONObject jsonObj = new JSONObject(json);
 			newVerCode = Integer.parseInt(jsonObj.getString("verCode"));
 			newVerName = jsonObj.getString("verName");
-			downloadFile= jsonObj.getString("downloadFile");
-			//exceptionDialog(newVerCode+"=="+newVerName);
+			if(downloadFile==null || "".equals(downloadFile.trim())){
+				downloadFile= jsonObj.getString("downloadFile");
+			}
+			
 		} catch (Exception e) {
 			exceptionDialog(e.getMessage());
 			// TODO Auto-generated catch block
@@ -307,18 +323,18 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 	 * 更新版本
 	 */
 	public void doNewVersionUpdate() {
-		int verCode = this.getVerCode();
-		String verName = this.getVerName();
+		//int verCode = this.getVerCode();
+		//String verName = this.getVerName();
 		StringBuffer sb = new StringBuffer();
-		sb.append("当前版本：");
-		sb.append(verName);
-		sb.append(" Code:");
-		sb.append(verCode);
-		sb.append(",发现版本：");
+		//sb.append("当前版本：");
+		//sb.append(verName);
+		//sb.append(" Code:");
+		//sb.append(verCode);
+		sb.append("发现新版本");
 		sb.append(newVerName);
-		sb.append(" Code:");
-		sb.append(newVerCode);
-		sb.append(",是否更新");
+		//sb.append(" Code:");
+		//sb.append(newVerCode);
+		sb.append(",是否立即更新?");
 		Dialog dialog = new AlertDialog.Builder(this.cordova.getActivity())
 				.setTitle("软件更新")
 				.setMessage(sb.toString())
@@ -328,11 +344,14 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 					public void onClick(DialogInterface dialog, int which) {
 						// TODO Auto-generated method stub
 						pd = new ProgressDialog(activity);
+						pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);// 设置水平进度条  
+						//pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 						pd.setTitle("正在下载");
 						pd.setMessage("请稍后。。。");
 						pd.setCancelable(true);// 设置是否可以通过点击Back键取消  
 						pd.setCanceledOnTouchOutside(false);// 设置在点击Dialog外是否取消Dialog进度条  
-						pd.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+						
+						pd.show();
 						downFile(downloadFile);
 					}
 				})
@@ -354,9 +373,13 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 	 * 下载apk
 	 */
 	public void downFile(final String url) {
-		pd.show();
+		
 //		new Thread() {
 //			public void run() {
+		cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))  
+        {  
 				HttpClient client = new DefaultHttpClient();
 				HttpGet get = new HttpGet(url);
 				HttpResponse response;
@@ -375,32 +398,43 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 					
 					if (is != null) {
 						File file = new File(
-								Environment.getDownloadCacheDirectory(),//Environment.getExternalStorageDirectory(),
+								//Environment.getDownloadCacheDirectory(),
+								Environment.getExternalStorageDirectory(),
 								UPDATE_SERVERAPK);
-						exceptionDialog(file.canWrite()+"");
+						//exceptionDialog(file.canWrite()+"");
 						//应该是没有写入权限造成的
 						//http://www.cnblogs.com/mengdd/p/3742623.html
 						fileOutputStream = new FileOutputStream(file);
 						byte[] b = new byte[1024];
 						int charb = -1;
 						int count = 0;
+						int progress=1;
 						while ((charb = is.read(b)) != -1) {
 							fileOutputStream.write(b, 0, charb);
 							count += charb;
+							progress = (int) (((float) count / length) * 100);  
+							//pd.incrementProgressBy(progress);
+							pd.setProgress(progress);
 						}
 					}
-					exceptionDialog("-111");
+					//exceptionDialog("-111");
 					fileOutputStream.flush();
 					if (fileOutputStream != null) {
 						fileOutputStream.close();
 					}
-					exceptionDialog("000");
+					//exceptionDialog("000");
 					down();
-					exceptionDialog("333");
+					//exceptionDialog("333");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+        } else {
+        	exceptionDialog("SD卡不具有读写权限");
+        	pd.cancel();
+        }
+            }
+        });
 //			}
 //		}.start();
 	}
@@ -412,7 +446,7 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 
 			super.handleMessage(msg);
 			pd.cancel();
-			exceptionDialog("111");
+			//exceptionDialog("111");
 			update();
 		}
 	};
@@ -433,7 +467,7 @@ public class CopyOfUpdateApp extends CordovaPlugin {
 	 * 安装应用
 	 */
 	public void update() {
-		exceptionDialog("2222");
+		//exceptionDialog("2222");
 		Intent intent = new Intent(Intent.ACTION_VIEW);
 		intent.setDataAndType(Uri.fromFile(new File(Environment
 				.getExternalStorageDirectory(), UPDATE_SERVERAPK)),
