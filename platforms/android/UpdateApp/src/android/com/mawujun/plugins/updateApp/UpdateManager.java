@@ -173,7 +173,7 @@ public class UpdateManager {
 			verCode=packageManager.getPackageInfo(activity.getPackageName(), 0).versionCode;
 		} catch (NameNotFoundException e) {
 			// TODO Auto-generated catch block
-			Log.e("版本号获取异常", e.getMessage());
+			Log.e(log_tag, e.getMessage());
 		}
 		return verCode;
 	}
@@ -189,7 +189,7 @@ public class UpdateManager {
 			PackageManager packageManager = activity.getPackageManager();
 			verName=packageManager.getPackageInfo(activity.getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
-			Log.e("版本名称获取异常", e.getMessage());
+			Log.e(log_tag, e.getMessage());
 		}
 		return verName;
 	}
@@ -280,10 +280,7 @@ public class UpdateManager {
 			exceptionDialog(e.getMessage());
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-//			Message msg=new Message();
-//			msg.what=closeProgressDialog;
-//			msg.obj="下载发生错误!";
-//			mHandler.sendMessage(msg);
+
 			return true;// 如果这里改为false 则不更新会退出程序
 		}finally {
             if (httpConnection != null) {
