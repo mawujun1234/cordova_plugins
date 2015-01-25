@@ -41,7 +41,7 @@
     <!-- android -->
     <platform name="android">
 
-        <source-file src="libs/android/com/mawujun/plugins/barcodescanner/BarcodeScanner_landscape.java" target-dir="src/com/mawujun/plugins/barcodescanner" />
+        <source-file src="src/android/com/mawujun/plugins/barcodescanner/BarcodeScanner_landscape.java" target-dir="src/com/mawujun/plugins/barcodescanner" />
         <!--
         <source-file src="R.java" target-dir="src/com/google/zxing/client/android" />
         -->
@@ -94,8 +94,9 @@
         </config-file>
 <!--
         <source-file src="libs/android/com.google.zxing.client.android.captureactivity.jar" target-dir="libs"/>
- -->
+	 -->
   		<source-file src="libs/android/LibraryProject/bin/captureactivity.jar" target-dir="libs"/>
+  	
         <!--
             LibraryProject/res/*.*
             search: (libs/android/LibraryProject/(.+?)/[^/]+)$
