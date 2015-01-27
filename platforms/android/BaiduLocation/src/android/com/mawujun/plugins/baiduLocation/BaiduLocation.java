@@ -33,6 +33,7 @@ public class BaiduLocation  extends CordovaPlugin {
 
 	private static final String DEFAULT_ERROR_MESSAGE = "服务端定位失败";
 
+	private static final String LOG_TAG = "BaiduLocation";
 	static {
 		ERROR_MESSAGE_MAP.put(61, "GPS定位结果");
 		ERROR_MESSAGE_MAP.put(62, "扫描整合定位依据失败。此时定位结果无效");
@@ -52,8 +53,10 @@ public class BaiduLocation  extends CordovaPlugin {
 		setCallbackContext(callbackContext);
 		if (GET_ACTION.equals(action)) {
 			cordova.getActivity().runOnUiThread(new Runnable() {
+			// cordova.getThreadPool().execute(new Runnable() {//使用这个线程，一运行就报错，一运行就报错
 				@Override
 				public void run() {
+					Log.d(LOG_TAG, "开始获取gps地址!");
 					locationClient = new LocationClient(cordova.getActivity());
 					myListener = new MyLocationListener();
 					locationClient.registerLocationListener(myListener);
