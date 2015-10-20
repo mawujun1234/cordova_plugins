@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="BaiduLocation/src/android"/>
+	<classpathentry kind="src" path="CallActivityPlugin/src/android"/>
 	<classpathentry kind="src" path="UpdateApp/src/android"/>
 	<classpathentry kind="src" path="BarcodeScanner-landscape/src/android"/>
 	<classpathentry kind="src" path="barcodeScanner-intent/src/android"/>
