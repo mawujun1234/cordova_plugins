@@ -6,7 +6,7 @@ function BaiduLocation() {
 BaiduLocation.prototype.execute=function(action, successCallback, errorCallback) {
 		cordova.exec(     
 			function(pos) {
-				var errcode = pos.code;
+				var errcode = pos.errcode;
 				if (errcode == 61 || errcode == 65 || errcode == 161) {
 					successCallback(pos);
 				} else {
@@ -28,8 +28,8 @@ BaiduLocation.prototype.execute=function(action, successCallback, errorCallback)
 BaiduLocation.prototype.getCurrentPosition=function(successCallback, errorCallback) {
 		this.execute("getCurrentPosition", successCallback, errorCallback);
 };
-BaiduLocation.prototype.stop= function(action, successCallback, errorCallback) {
-		this.execute("stop", successCallback, errorCallback);
+BaiduLocation.prototype.stopGetPosition= function(action, successCallback, errorCallback) {
+		this.execute("stopGetPosition", successCallback, errorCallback);
 }
 var baiduLocation=new BaiduLocation();
 module.exports = baiduLocation;
