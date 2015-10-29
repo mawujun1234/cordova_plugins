@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
  
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" id="com.mawujun.plugins.baiduLocation" version="0.1.0">
-    <name>BaiduLocation</name>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="com.mawujun.plugins.baiduMapAll"
+    version="1.0.1">
+    
+    <name>BaiduMapAll</name>
     <description>Baidu Location Plugin for Phonegap</description>
     <license>MIT</license>
-    <keywords>baidu, location, phonegap</keywords>
+    <keywords>baidu, map, cordova</keywords>
     
     <engines>
         <engine name="cordova" version=">=3.4.0" />
     </engines>
-  	<js-module src="www/BaiduLocation.js" name="BaiduLocation">
-            <clobbers target="cordova.plugins.baiduLocation" />
+  	<js-module src="www/BaiduMapAll.js" name="BaiduMapAll">
+            <clobbers target="cordova.plugins.baiduMapAll" />
     </js-module>
     <!-- android -->
     <platform name="android">
        
  
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="BaiduLocation">
-                <param name="android-package" value="com.mawujun.plugins.baiduLocation.BaiduLocation"/>
+            <feature name="BaiduMapAll">
+                <param name="android-package" value="com.mawujun.plugins.baiduMapAll.BaiduMapAll"/>
             </feature>
         </config-file> 
         
@@ -45,7 +48,7 @@
 			<uses-permission android:name="android.permission.READ_PHONE_STATE" />  
 			<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />  
 			<uses-permission android:name="android.permission.RECORD_AUDIO" />     
-			 <-- 摄影机 -->     
+			<!-- 摄影机 -->     
 			<uses-permission android:name="android.permission.CAMERA" />
         </config-file>
 
@@ -55,12 +58,34 @@
             <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="Gf2Q8bxraGg8SASQuOmvenLS" />
         </config-file>
         
-        <source-file src="src/android/com/mawujun/plugins/baiduLocation/" target-dir="src/com/mawujun/plugins/baiduLocation" />   
+        <source-file src="src/android/com/mawujun/plugins/baiduMapAll/BaiduMapAll.java" target-dir="src/com/mawujun/plugins/baiduMapAll" />
+        <source-file src="src/android/com/mawujun/plugins/baiduMapAll/LocationApplication.java" target-dir="src/com/mawujun/plugins/baiduMapAll" /> 
+        
+        
+        <!-- 导航相关的Active -->
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+			<activity
+	            android:name="com.mawujun.plugins.baiduMapAll.BNDemoMainActivity"
+	            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+	            android:label="初始化" >
+	        </activity>
+        	<activity
+	            android:name="com.mawujun.plugins.baiduMapAll.BNDemoGuideActivity"
+	            android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
+	            android:label="导航" >
+	        </activity>
+        </config-file>
+        <source-file src="libs/android/assets/BaiduNaviSDK_Resource_2.0.png" target-dir="assets" framework="true"/>  
+        <source-file src="libs/android/assets/channel" target-dir="assets" framework="true"/>  
+        <source-file src="src/android/layout/bndemomainactivity.xml" target-dir="res/layout" /> 
+        <source-file src="src/android/com/mawujun/plugins/baiduMapAll/BNDemoMainActivity.java" target-dir="src/com/mawujun/plugins/baiduMapAll" />
+        <source-file src="src/android/com/mawujun/plugins/baiduMapAll/BNDemoGuideActivity.java" target-dir="src/com/mawujun/plugins/baiduMapAll" />
+        
+        
         <source-file src="libs/android/libs/BaiduLBS_Android.jar" target-dir="libs" framework="true"/>      
         <source-file src="libs/android/libs/httpmime-4.1.2.jar" target-dir="libs" framework="true"/> 
         <source-file src="libs/android/libs/IndoorscapeAlbumPlugin.jar" target-dir="libs" framework="true"/> 
-        
-         <source-file src="libs/android/libs/armeabi/liblocSDK6a.so" target-dir="libs/armeabi" framework="true"/>   
+         
          <source-file src="libs/android/libs/armeabi/libapp_BaiduNaviApplib.so" target-dir="libs/armeabi" framework="true"/>   
          <source-file src="libs/android/libs/armeabi/libapp_BaiduPanoramaAppLib.so" target-dir="libs/armeabi" framework="true"/>
          <source-file src="libs/android/libs/armeabi/libapp_BaiduVIlib.so" target-dir="libs/armeabi" framework="true"/>   

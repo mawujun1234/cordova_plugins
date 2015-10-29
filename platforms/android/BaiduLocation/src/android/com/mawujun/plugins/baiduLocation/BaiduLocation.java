@@ -17,17 +17,20 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.location.LocationClientOption.LocationMode;
+import com.mawujun.plugins.baiduMapAll.BaiduMapAll;
 
 
 public class BaiduLocation  extends CordovaPlugin {
 	private static final String STOP_ACTION = "stopGetPosition";
 	private static final String GET_ACTION = "getCurrentPosition";
-	public LocationClient locationClient = null;
+	public static LocationClient locationClient = null;
+	public static BDLocationListener myListener;
+	
 	public JSONObject jsonObj = new JSONObject();
 	public boolean result = false;
 	public CallbackContext callbackContext;
 
-	public BDLocationListener myListener;
+	
 
 	private static final Map<Integer, String> ERROR_MESSAGE_MAP = new HashMap<Integer, String>();
 
@@ -66,27 +69,16 @@ public class BaiduLocation  extends CordovaPlugin {
 					//http://developer.baidu.com/map/index.php?title=android-locsdk/guide/v5-0
 					//配置信息
 					Log.d(LOG_TAG, "开始获取gps地址!");
-					locationClient = new LocationClient(cordova.getActivity());
-					myListener = new MyLocationListener();
-					locationClient.registerLocationListener(myListener);
-					LocationClientOption option = new LocationClientOption();
-					option.setOpenGps(true);//可选，默认false,设置是否使用gps
-					//高精度定位模式：这种定位模式下，会同时使用网络定位和GPS定位，优先返回最高精度的定位结果；
-					//低功耗定位模式：这种定位模式下，不会使用GPS，只会使用网络定位（Wi-Fi和基站定位）；
-					//仅用设备定位模式：这种定位模式下，不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位。
-					option.setLocationMode(LocationMode.Hight_Accuracy);////可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
-			        option.setScanSpan(1000);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
-			        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
-			        option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
-			        option.setIsNeedLocationDescribe(false);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
-			        option.setIsNeedLocationPoiList(false);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
-			        option.setIgnoreKillProcess(false);//可选，默认false，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认杀死
-			        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
-			        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
-			
-					option.setCoorType("bd09ll");// 返回的定位结果是百度经纬度，默认值gcj02
-					option.setProdName("BaiduLoc");
-					locationClient.setLocOption(option);
+					if(locationClient==null){
+						locationClient = new LocationClient(cordova.getActivity());
+						
+					}
+					if(myListener==null){
+						myListener = new MyLocationListener();
+						locationClient.registerLocationListener(myListener);
+					}
+					//配置参数是可以每次定位的时候都不同的,只要修改方法，把参数传递进去就可以了
+					initLocation();
 					
 //					option.setCoorType("bd09ll");//返回的定位结果是百度经纬度,默认值gcj02
 //					option.setScanSpan(5000);//设置发起定位请求的间隔时间为5000ms,不用定时，通过自己在js中定时请求，来获取定时
@@ -117,6 +109,28 @@ public class BaiduLocation  extends CordovaPlugin {
 			}
 		}
 		return result;
+	}
+	
+	private void initLocation() {
+		//配置参数是可以每次定位的时候都不同的
+		LocationClientOption option = new LocationClientOption();
+		option.setOpenGps(true);//可选，默认false,设置是否使用gps
+		//高精度定位模式：这种定位模式下，会同时使用网络定位和GPS定位，优先返回最高精度的定位结果；
+		//低功耗定位模式：这种定位模式下，不会使用GPS，只会使用网络定位（Wi-Fi和基站定位）；
+		//仅用设备定位模式：这种定位模式下，不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位。
+		option.setLocationMode(LocationMode.Hight_Accuracy);////可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
+        option.setScanSpan(1000);//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
+        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
+        option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
+        option.setIsNeedLocationDescribe(false);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
+        option.setIsNeedLocationPoiList(false);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
+        option.setIgnoreKillProcess(false);//可选，默认false，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认杀死
+        option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
+        option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
+
+		option.setCoorType("bd09ll");// 返回的定位结果是百度经纬度，默认值gcj02
+		option.setProdName("BaiduLoc");
+		locationClient.setLocOption(option);
 	}
 
 	/**
@@ -173,7 +187,7 @@ public class BaiduLocation  extends CordovaPlugin {
 						coords.put("operationers", location.getOperators());
 		            } 
 
-				Log.d("BaiduLocationPlugin", "run: " + jsonObj.toString());
+				Log.d(BaiduMapAll.LOG_TAG, "run: " + jsonObj.toString());
 				callbackContext.success(jsonObj);
 				result = true;
 			} catch (JSONException e) {
