@@ -1,7 +1,9 @@
 package com.mawujun.plugins.baiduMapAll;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -235,6 +237,7 @@ public class LocationApplication {
 
     }
     
+    SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public void postCoords(BDLocation location){
     	
            
@@ -259,7 +262,8 @@ public class LocationApplication {
 			nameValuePairs.add(new BasicNameValuePair("radius", location.getRadius()+""));
 			nameValuePairs.add(new BasicNameValuePair("direction", location.getDirection()+""));
 			nameValuePairs.add(new BasicNameValuePair("speed", location.getDirection()+""));
-			nameValuePairs.add(new BasicNameValuePair("loc_time", location.getTime()));//String，时间，ex:2010-01-01 14:01:01
+			//nameValuePairs.add(new BasicNameValuePair("loc_time",location.getTime()));//不使用这个，因为百度会缓存金维度
+			nameValuePairs.add(new BasicNameValuePair("loc_time",format.format(new Date())));//String，时间，ex:2010-01-01 14:01:01
 			
 			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
 			
