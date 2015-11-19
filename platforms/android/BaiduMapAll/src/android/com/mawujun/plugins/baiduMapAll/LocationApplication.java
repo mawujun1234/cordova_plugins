@@ -259,7 +259,7 @@ public class LocationApplication {
 			nameValuePairs.add(new BasicNameValuePair("radius", location.getRadius()+""));
 			nameValuePairs.add(new BasicNameValuePair("direction", location.getDirection()+""));
 			nameValuePairs.add(new BasicNameValuePair("speed", location.getDirection()+""));
-			nameValuePairs.add(new BasicNameValuePair("locationDate", location.getTime()));//String，时间，ex:2010-01-01 14:01:01
+			nameValuePairs.add(new BasicNameValuePair("loc_time", location.getTime()));//String，时间，ex:2010-01-01 14:01:01
 			
 			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
 			
