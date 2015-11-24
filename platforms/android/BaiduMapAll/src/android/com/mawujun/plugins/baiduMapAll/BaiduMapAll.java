@@ -26,8 +26,8 @@ public class BaiduMapAll  extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, final JSONArray args,
 			final CallbackContext callbackContext) {
-		//setCallbackContext(callbackContext);
-		//final LocationApplication locationApplication=(LocationApplication)cordova.getActivity().getApplication();
+
+		//acquireWakeLock();
 		if(locationApplication==null){
 			locationApplication=new LocationApplication();	
 		}
@@ -45,7 +45,7 @@ public class BaiduMapAll  extends CordovaPlugin {
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			callbackContext.error("传递的参数有问题!");
+			callbackContext.error("传递的参数有问题!"+e.getMessage());
 			return false;
 		}
 		//locationApplication.callbackContext=callbackContext;
@@ -118,7 +118,10 @@ public class BaiduMapAll  extends CordovaPlugin {
 	@Override
 	public void onDestroy() {
 		locationApplication.stop();
+		//releaseWakeLock();
 		super.onDestroy();
 	}
+	
+	
 
 }
