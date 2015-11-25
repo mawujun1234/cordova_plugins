@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.LocationManager;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -62,12 +64,14 @@ public class BaiduMapAll  extends CordovaPlugin {
 				public void run() {
 					//配置信息
 					Log.i(LOG_TAG, "开始获取gps地址!");
-					//acquireWakeLock();
+					//
 //					//如果需要自定义配置信息，只要重新实现下面这个方法就可以了，或者重载
 //					//locationApplication.initLocation();
 //					locationApplication.start();
 //					locationApplication.mLocationClient.requestLocation();
 //					callbackContext.success("success");
+					
+					acquireWakeLock();
 					try {
 					JSONObject params= args.getJSONObject(0);
 					Intent intent=new Intent(cordova.getActivity(), LocationApplication.class);
@@ -188,33 +192,33 @@ public class BaiduMapAll  extends CordovaPlugin {
 	@Override
 	public void onDestroy() {
 		//locationApplication.stop();
-		//releaseWakeLock();
+		releaseWakeLock();
 		cordova.getActivity().stopService(new Intent(cordova.getActivity(), LocationApplication.class));
 		super.onDestroy();
 	}
 	
-//	 WakeLock wakeLock; 
-//		private void acquireWakeLock() {
-//			if (null == wakeLock) {
-//				PowerManager pm = (PowerManager) cordova.getActivity().getSystemService(Context.POWER_SERVICE);
-//				wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
-//						| PowerManager.ON_AFTER_RELEASE, getClass()
-//						.getCanonicalName());
-//				if (null != wakeLock) {
-//					// Log.i(TAG, "call acquireWakeLock");
-//					wakeLock.acquire();
-//				}
-//			}
-//		}
-//
-//		// 释放设备电源锁
-//		private void releaseWakeLock() {
-//			if (null != wakeLock && wakeLock.isHeld()) {
-//				// Log.i(TAG, "call releaseWakeLock");
-//				wakeLock.release();
-//				wakeLock = null;
-//			}
-//		}
+	 WakeLock wakeLock; 
+		private void acquireWakeLock() {
+			if (null == wakeLock) {
+				PowerManager pm = (PowerManager) cordova.getActivity().getSystemService(Context.POWER_SERVICE);
+				wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+						| PowerManager.ON_AFTER_RELEASE, getClass()
+						.getCanonicalName());
+				if (null != wakeLock) {
+					// Log.i(TAG, "call acquireWakeLock");
+					wakeLock.acquire();
+				}
+			}
+		}
+
+		// 释放设备电源锁
+		private void releaseWakeLock() {
+			if (null != wakeLock && wakeLock.isHeld()) {
+				// Log.i(TAG, "call releaseWakeLock");
+				wakeLock.release();
+				wakeLock = null;
+			}
+		}
 	
 
 }
