@@ -179,7 +179,7 @@ public class LocationApplication extends Service{
     	
         @Override
         public void onReceiveLocation(BDLocation location) {
-        	toast("开始获取gps信息了", Toast.LENGTH_SHORT);
+        	
         	//JSONObject jsonObj = new JSONObject();
         	if (location == null) {
         		//Toast.makeText(activityContex, "没有获取到经纬度数据!", Toast.LENGTH_LONG).show();
@@ -191,12 +191,14 @@ public class LocationApplication extends Service{
         	
 			
 			if (location.getLocType() == BDLocation.TypeGpsLocation) {// GPS定位结果
+				//toast("开始获取gps信息了", Toast.LENGTH_SHORT);
 				 postCoords(location);
 				 
 				 currentLongitude=location.getLongitude();
 					currentLatitude=location.getLatitude();
 
 			} else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
+				//toast("开始获取gps信息了", Toast.LENGTH_SHORT);
 				 postCoords(location);
 				 
 				 currentLongitude=location.getLongitude();
@@ -283,6 +285,7 @@ public class LocationApplication extends Service{
 			nameValuePairs.add(new BasicNameValuePair("direction", location.getDirection()+""));
 			nameValuePairs.add(new BasicNameValuePair("speed", location.getSpeed()+""));
 			//nameValuePairs.add(new BasicNameValuePair("loc_time",location.getTime()));//不使用这个，因为百度会缓存金维度
+			nameValuePairs.add(new BasicNameValuePair("loc_type",(location.getLocType()==BDLocation.TypeGpsLocation?"gps":"network")));
 			nameValuePairs.add(new BasicNameValuePair("loc_time",format.format(loc_time)));//String，时间，ex:2010-01-01 14:01:01
 			nameValuePairs.add(new BasicNameValuePair("distance", distance+""));
 			
@@ -402,7 +405,7 @@ public class LocationApplication extends Service{
 		mLocationClient.start();
 		mLocationClient.requestLocation();
 
-		toast("开始获取gps信息了", Toast.LENGTH_LONG);
+		//toast("开始获取gps信息了", Toast.LENGTH_LONG);
 		//LOG.i(BaiduMapAll.LOG_TAG, "开始获取gps信息了================================================");
 		return super.onStartCommand(intent, flags,startId);
 	}
