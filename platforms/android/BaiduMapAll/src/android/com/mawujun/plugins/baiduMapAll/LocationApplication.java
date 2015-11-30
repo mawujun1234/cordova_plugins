@@ -194,16 +194,24 @@ public class LocationApplication extends Service{
 				//toast("开始获取gps信息了", Toast.LENGTH_SHORT);
 				 postCoords(location);
 				 
-				 currentLongitude=location.getLongitude();
-					currentLatitude=location.getLatitude();
+//				 currentLongitude=location.getLongitude();
+//					currentLatitude=location.getLatitude();
 
 			} else if (location.getLocType() == BDLocation.TypeNetWorkLocation) {// 网络定位结果
 				//toast("开始获取gps信息了", Toast.LENGTH_SHORT);
 				 postCoords(location);
 				 
-				 currentLongitude=location.getLongitude();
-				 currentLatitude=location.getLatitude();
-			} else {
+//				 currentLongitude=location.getLongitude();
+//				 currentLatitude=location.getLatitude();
+			} else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
+                toast("离线定位成功，离线定位结果也是有效的",Toast.LENGTH_LONG);
+            } else if (location.getLocType() == BDLocation.TypeServerError) {
+            	toast("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因",Toast.LENGTH_LONG);
+            } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
+            	toast("网络不通导致定位失败，请检查网络是否通畅",Toast.LENGTH_LONG);
+            } else if (location.getLocType() == BDLocation.TypeCriteriaException) {
+            	 toast("无法获取有效定位依据导致定位失败，一般是由于手机的原因，处于飞行模式下一般会造成这种结果，可以试着重启手机",Toast.LENGTH_LONG);
+            }else {
 				int locationType = location.getLocType();
 				String msg="获取地址失败:"+getErrorMessage(locationType);
 				LOG.e(BaiduMapAll.LOG_TAG, msg);
@@ -240,13 +248,18 @@ public class LocationApplication extends Service{
     	}
     	
     	Date loc_time=new Date();	
-		//如果这次上传还上一次上传的时间间隔小于规定的时间间隔，那就不上传
-		if(current_loc_time!=null && (loc_time.getTime()-current_loc_time)<this.getGps_interval()){
+		//如果这次上传还上一次上传的时间间隔小于规定的时间间隔，那就不上传,弄一个10秒的误差，如果快10秒多算可以，因为两次定位之间会有几毫秒的误差
+		if(current_loc_time!=null && (loc_time.getTime()-current_loc_time)<(this.getGps_interval()-10000)){
 			return;
 		}
 
+		// 两次定位的时间间隔
+		long loc_time_interval = 0;
+		if (current_loc_time != null) {
+			loc_time_interval = loc_time.getTime() - current_loc_time;
+		}
 		
-		current_loc_time=loc_time.getTime();
+		
 		
     	Double distance=0.0;
     	if(currentLatitude!=null){
@@ -281,12 +294,14 @@ public class LocationApplication extends Service{
 			}
 			nameValuePairs.add(new BasicNameValuePair("longitude", location.getLongitude()+""));
 			nameValuePairs.add(new BasicNameValuePair("latitude", location.getLatitude()+""));
+			nameValuePairs.add(new BasicNameValuePair("altitude", (location.getAltitude()==Double.MIN_VALUE?0:location.getAltitude())+""));//默认值Double.MIN_VALUE,但是数据库存储会出问题，所以默认值就改成0
 			nameValuePairs.add(new BasicNameValuePair("radius", location.getRadius()+""));
 			nameValuePairs.add(new BasicNameValuePair("direction", location.getDirection()+""));
 			nameValuePairs.add(new BasicNameValuePair("speed", location.getSpeed()+""));
 			//nameValuePairs.add(new BasicNameValuePair("loc_time",location.getTime()));//不使用这个，因为百度会缓存金维度
 			nameValuePairs.add(new BasicNameValuePair("loc_type",(location.getLocType()==BDLocation.TypeGpsLocation?"gps":"network")));
 			nameValuePairs.add(new BasicNameValuePair("loc_time",format.format(loc_time)));//String，时间，ex:2010-01-01 14:01:01
+			nameValuePairs.add(new BasicNameValuePair("loc_time_interval",loc_time_interval+""));
 			nameValuePairs.add(new BasicNameValuePair("distance", distance+""));
 			
 			httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8));
@@ -303,10 +318,11 @@ public class LocationApplication extends Service{
 		    HttpConnectionParams.setSoTimeout(httpParameters, 30000);  
 		    HttpClient client = new DefaultHttpClient(httpParameters);
 			httpResponse = client.execute(httpPost);
-			if (httpResponse.getStatusLine().getStatusCode() == 200) {
+			if (httpResponse.getStatusLine().getStatusCode() == 200) {			
+				currentLongitude=location.getLongitude();
+				currentLatitude=location.getLatitude();
+				current_loc_time=loc_time.getTime();
 				
-				//String result = EntityUtils.toString(httpResponse.getEntity());
-				//Log.d(BaiduMapAll.LOG_TAG, result);
 			} else {
 				//这里响应代码不是200 页正茬插入了
 				//Toast.makeText(activityContex, "发送经纬度到后台失败!"+httpResponse.getStatusLine().getStatusCode()+this.getUploadUrl(), Toast.LENGTH_LONG).show();
