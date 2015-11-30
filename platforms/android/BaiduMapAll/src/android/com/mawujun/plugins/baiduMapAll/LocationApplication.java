@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cordova.LOG;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -155,13 +156,15 @@ public class LocationApplication extends Service{
 		//仅用设备定位模式：这种定位模式下，不需要连接网络，只使用GPS进行定位，这种模式下不支持室内环境的定位。
 		option.setLocationMode(LocationMode.Hight_Accuracy);////可选，默认高精度，设置定位模式，高精度，低功耗，仅设备
         option.setScanSpan(this.getGps_interval());//可选，默认0，即仅定位一次，设置发起定位请求的间隔需要大于等于1000ms才是有效的
-        option.setIsNeedAddress(true);//可选，设置是否需要地址信息，默认不需要
+        option.setIsNeedAddress(false);//可选，设置是否需要地址信息，默认不需要
         option.setLocationNotify(true);//可选，默认false，设置是否当gps有效时按照1S1次频率输出GPS结果
         option.setIsNeedLocationDescribe(false);//可选，默认false，设置是否需要位置语义化结果，可以在BDLocation.getLocationDescribe里得到，结果类似于“在北京天安门附近”
         option.setIsNeedLocationPoiList(false);//可选，默认false，设置是否需要POI结果，可以在BDLocation.getPoiList里得到
         option.setIgnoreKillProcess(false);//可选，默认false，定位SDK内部是一个SERVICE，并放到了独立进程，设置是否在stop的时候杀死这个进程，默认杀死
         option.SetIgnoreCacheException(false);//可选，默认false，设置是否收集CRASH信息，默认收集
         option.setEnableSimulateGps(false);//可选，默认false，设置是否需要过滤gps仿真结果，默认需要
+        option.setOpenGps(true);//可选，默认false,设置是否使用gps
+        //option.disableCache(true);
 
 		option.setCoorType(CoordinateType.BD09LL);// 返回的定位结果是百度经纬度，默认值gcj02,//wgs84:国际经纬度坐标  "gcj02":国家测绘局标准,"bd09ll":百度经纬度标准,"bd09":百度墨卡托标准
 		option.setProdName("BaiduLoc");
@@ -176,10 +179,13 @@ public class LocationApplication extends Service{
     	
         @Override
         public void onReceiveLocation(BDLocation location) {
+        	toast("开始获取gps信息了", Toast.LENGTH_SHORT);
         	//JSONObject jsonObj = new JSONObject();
         	if (location == null) {
         		//Toast.makeText(activityContex, "没有获取到经纬度数据!", Toast.LENGTH_LONG).show();
-        		toast("没有获取到经纬度数据!",Toast.LENGTH_LONG);
+        		String msg="没有获取到经纬度数据!";
+				LOG.e(BaiduMapAll.LOG_TAG, msg);
+        		toast(msg,Toast.LENGTH_LONG);
         		return;
         	}
         	
@@ -197,8 +203,10 @@ public class LocationApplication extends Service{
 				 currentLatitude=location.getLatitude();
 			} else {
 				int locationType = location.getLocType();
+				String msg="获取地址失败:"+getErrorMessage(locationType);
+				LOG.e(BaiduMapAll.LOG_TAG, msg);
 				//Toast.makeText(activityContex, "获取地址失败:"+getErrorMessage(locationType), Toast.LENGTH_LONG).show();
-				toast("获取地址失败:"+getErrorMessage(locationType),Toast.LENGTH_LONG);
+				toast(msg,Toast.LENGTH_LONG);
 			}
 
         }
@@ -206,8 +214,24 @@ public class LocationApplication extends Service{
 
     }
     
+    public void aaa(BDLocation location){
+		//对数据进行纠偏
+		if(location.getSpeed()==0){
+			// 速度为0时，强制方向为0；
+			location.setDirection(0f);
+			//数据中的速度值为0时，就不去更新地图上的经纬度
+			if(currentLongitude!=null){
+				location.setLatitude(currentLatitude);
+				location.setLongitude(currentLongitude);
+			}
+			
+		} else {
+			
+		}
+    }
+    
     SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public void postCoords(BDLocation location){
+    public void postCoords(BDLocation location) {
     	//如果没有上传路径就不进行上传
     	if(this.getUploadUrl()==null || "".equals(this.getUploadUrl()) ){
     		return;
@@ -218,6 +242,8 @@ public class LocationApplication extends Service{
 		if(current_loc_time!=null && (loc_time.getTime()-current_loc_time)<this.getGps_interval()){
 			return;
 		}
+
+		
 		current_loc_time=loc_time.getTime();
 		
     	Double distance=0.0;
@@ -230,7 +256,7 @@ public class LocationApplication extends Service{
         	distance=DistanceUtil. getDistance(pt1, pt2);
     	}
     
-    	
+    	aaa(location);
     	
 		
 		
@@ -255,7 +281,7 @@ public class LocationApplication extends Service{
 			nameValuePairs.add(new BasicNameValuePair("latitude", location.getLatitude()+""));
 			nameValuePairs.add(new BasicNameValuePair("radius", location.getRadius()+""));
 			nameValuePairs.add(new BasicNameValuePair("direction", location.getDirection()+""));
-			nameValuePairs.add(new BasicNameValuePair("speed", location.getDirection()+""));
+			nameValuePairs.add(new BasicNameValuePair("speed", location.getSpeed()+""));
 			//nameValuePairs.add(new BasicNameValuePair("loc_time",location.getTime()));//不使用这个，因为百度会缓存金维度
 			nameValuePairs.add(new BasicNameValuePair("loc_time",format.format(loc_time)));//String，时间，ex:2010-01-01 14:01:01
 			nameValuePairs.add(new BasicNameValuePair("distance", distance+""));
