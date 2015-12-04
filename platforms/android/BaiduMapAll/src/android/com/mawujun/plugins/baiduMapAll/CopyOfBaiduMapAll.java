@@ -7,35 +7,27 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 
-public class BaiduMapAll  extends CordovaPlugin {
+public class CopyOfBaiduMapAll  extends CordovaPlugin {
 	private static final String STOP_ACTION = "stopGetPosition";
 	private static final String GET_ACTION = "getCurrentPosition";
 	private static final String NAVI_ACTION = "navi";
 	public static final String LOG_TAG = "BaiduMapAll";
 	
-	public static final String loc_action = "com.mawujun.plugins.baiduMapAll.LocationApplication";
+
 	//public static LocationApplication locationApplication;
 	//private LocationClient mLocationClient;
-	
-	
-    public static Double  currentLongitude;
-    public static Double  currentLatitude;
-    public static Long  current_loc_time;//最近一次的提交时间
-
-    public static String uploadUrl;
-    public static int gps_interval=0;
-    public static JSONObject params;//需要传递到后台的数据
 	
 
 
@@ -43,58 +35,54 @@ public class BaiduMapAll  extends CordovaPlugin {
 	public boolean execute(String action, final JSONArray args,
 			final CallbackContext callbackContext) {
 
+//		//acquireWakeLock();
+//		if(locationApplication==null){
+//			locationApplication=new LocationApplication();	
+//		}
+//		try {
+////			locationApplication.setSessionId(args.getString(0));
+////			locationApplication.setLoginName(args.getString(1));
+////			locationApplication.setUuid(args.getString(2));
+//			JSONObject params= args.getJSONObject(0);
+//			locationApplication.setUploadUrl(params.getString("uploadUrl"));
+//			locationApplication.setGps_interval(params.getInt("gps_interval"));
+//			locationApplication.setParams(params);
+//			
+//			
+//			locationApplication.onCreate(cordova.getActivity());
+//		} catch (JSONException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			callbackContext.error("传递的参数有问题!"+e.getMessage());
+//			return false;
+//		}
+		//locationApplication.callbackContext=callbackContext;
 		
 		if (GET_ACTION.equals(action)) {
-			
-			try {
-				params= args.getJSONObject(0);
-				BaiduMapAll.uploadUrl=params.getString("uploadUrl");
-				BaiduMapAll.gps_interval=params.getInt("gps_interval");
-			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					//配置信息
 					Log.i(LOG_TAG, "开始获取gps地址!");
-
+					//
+//					//如果需要自定义配置信息，只要重新实现下面这个方法就可以了，或者重载
+//					//locationApplication.initLocation();
+//					locationApplication.start();
+//					locationApplication.mLocationClient.requestLocation();
+//					callbackContext.success("success");
 					
 					acquireWakeLock();
 					try {
-//					JSONObject params= args.getJSONObject(0);
-//					Intent intent=new Intent(cordova.getActivity(), LocationApplication.class);
-//					intent.putExtra("uploadUrl", params.getString("uploadUrl"));
-//					intent.putExtra("gps_interval", params.getInt("gps_interval"));
-//					intent.putExtra("params", params.toString());
-//					
-//					
-//					//initGPS();
-//					cordova.getActivity().startService(intent);
-					
-						
-					Log.i(LOG_TAG, "start alarm");
-					
-					
-					AlarmManager am = (AlarmManager)cordova.getActivity().getSystemService(Context.ALARM_SERVICE);
-
+					JSONObject params= args.getJSONObject(0);
 					Intent intent=new Intent(cordova.getActivity(), LocationApplication.class);
-					intent.setAction(loc_action);
-					//intent.putExtra("uploadUrl", params.getString("uploadUrl"));
-					//intent.putExtra("gps_interval", params.getInt("gps_interval"));
-					//intent.putExtra("params", params.toString());
-					
-					//String params_str=intent.getStringExtra("params");
+					intent.putExtra("uploadUrl", params.getString("uploadUrl"));
+					intent.putExtra("gps_interval", params.getInt("gps_interval"));
+					intent.putExtra("params", params.toString());
 					
 					
-					PendingIntent pendingIntent = PendingIntent.getService(cordova.getActivity(), 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
+					//initGPS();
+					cordova.getActivity().startService(intent);
 					
-					
-					//am.cancel(collectSender);
-					am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(),params.getInt("gps_interval"), pendingIntent);
 					
 					callbackContext.success("success");
 					
@@ -154,7 +142,48 @@ public class BaiduMapAll  extends CordovaPlugin {
 
 		return false;
 	}
-
+	
+//	private void initGPS(){ 
+//        LocationManager locationManager=(LocationManager) cordova.getActivity().getSystemService(Context.LOCATION_SERVICE); 
+//
+//        //判断GPS模块是否开启，如果没有则开启 
+//        if(!locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)){ 
+////         Toast.makeText( cordova.getActivity(), "GPS没有打开，请打开它!", Toast.LENGTH_SHORT).show(); 
+////         //转到手机设置界面，用户设置GPS
+////         Intent intent=new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS); 
+////         cordova.getActivity().startActivityForResult(intent,0); //设置完成后返回到原来的界面
+//         
+//			AlertDialog.Builder dialog = new AlertDialog.Builder(cordova.getActivity());
+//			dialog.setMessage("请打开GPS!!");
+//			dialog.setPositiveButton("确定",
+//					new android.content.DialogInterface.OnClickListener() {
+//
+//						@Override
+//						public void onClick(DialogInterface arg0, int arg1) {
+//
+//							// 转到手机设置界面，用户设置GPS
+//							Intent intent = new Intent(
+//									Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//							cordova.getActivity().startActivityForResult(
+//									intent, 0); // 设置完成后返回到原来的界面
+//
+//						}
+//					});
+//			dialog.setNeutralButton("取消",
+//					new android.content.DialogInterface.OnClickListener() {
+//
+//						@Override
+//						public void onClick(DialogInterface arg0, int arg1) {
+//							arg0.dismiss();
+//						}
+//					});
+//			dialog.show();
+//         
+//        } 
+//        else { 
+//        	
+//        } 
+//   } 
 	
 
 
@@ -164,18 +193,8 @@ public class BaiduMapAll  extends CordovaPlugin {
 	public void onDestroy() {
 		//locationApplication.stop();
 		releaseWakeLock();
-		//cordova.getActivity().stopService(new Intent(cordova.getActivity(), LocationApplication.class));
-		stopPollingService(cordova.getActivity());
+		cordova.getActivity().stopService(new Intent(cordova.getActivity(), LocationApplication.class));
 		super.onDestroy();
-	}
-	
-	public static void stopPollingService(Context context) {
-		Log.i("ServiceUtil-AlarmManager", "cancleAlarmManager to start ");  
-	    Intent intent = new Intent(context,LocationApplication.class);  
-	    intent.setAction(loc_action);  
-	    PendingIntent pendingIntent=PendingIntent.getService(context, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);  
-	    AlarmManager alarm=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);  
-	    alarm.cancel(pendingIntent);  
 	}
 	
 	 WakeLock wakeLock; 
@@ -199,6 +218,7 @@ public class BaiduMapAll  extends CordovaPlugin {
 				wakeLock.release();
 				wakeLock = null;
 			}
-		}	
+		}
+	
 
 }
