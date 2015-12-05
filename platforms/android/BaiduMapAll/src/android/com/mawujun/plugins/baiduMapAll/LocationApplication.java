@@ -246,6 +246,7 @@ public class LocationApplication extends Service{
     
     SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public void postCoords(BDLocation location) {
+    	MyLog.i(BaiduMapAll.LOG_TAG, "正在发送定位信息!");
     	//Log.i(BaiduMapAll.LOG_TAG, "11111111111111!!"+this.getUploadUrl());
     	//如果没有上传路径就不进行上传
     	if(BaiduMapAll.uploadUrl==null || "".equals(BaiduMapAll.uploadUrl) ){
@@ -410,6 +411,7 @@ public class LocationApplication extends Service{
 	@Override
 	 public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(BaiduMapAll.LOG_TAG, "启动LocationApplication!");
+		MyLog.i(BaiduMapAll.LOG_TAG, "启动LocationApplication!");
 		
 		//this.setUploadUrl(intent.getStringExtra("uploadUrl"));
 		//this.setGps_interval(intent.getIntExtra("gps_interval",0));
