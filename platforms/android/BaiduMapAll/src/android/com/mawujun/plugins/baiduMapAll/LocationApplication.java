@@ -209,7 +209,8 @@ public class LocationApplication extends Service{
 //				 currentLatitude=location.getLatitude();
 			} else if (location.getLocType() == BDLocation.TypeOffLineLocation) {// 离线定位结果
 				Log.i(BaiduMapAll.LOG_TAG, "离线定位成功，离线定位结果也是有效的!!");
-                toast("离线定位成功，离线定位结果也是有效的",Toast.LENGTH_LONG);
+				postCoords(location);
+               // toast("离线定位成功，离线定位结果也是有效的",Toast.LENGTH_LONG);
             } else if (location.getLocType() == BDLocation.TypeServerError) {
             	toast("服务端网络定位失败，可以反馈IMEI号和大体定位时间到loc-bugs@baidu.com，会有人追查原因",Toast.LENGTH_LONG);
             } else if (location.getLocType() == BDLocation.TypeNetWorkException) {
@@ -228,8 +229,24 @@ public class LocationApplication extends Service{
 
 
     }
-    
+    /**
+     * 如果是网络定位返回的信息，就自动设置为上次gps定位的内容，因为网络定位太不准了，当用网络定位时就假定你是进入到了房间呢，那就假设你不懂了
+     * http://blog.csdn.net/forlong401/article/details/8903142
+     * http://wenku.baidu.com/link?url=6ujvZatU_4gVsgATf43p8uC2us3zr0_J6dri7VZJTR4Z0wch0ZACUAa3U8y74a-lQFKujSuvzcSSK5_ZGZ971Y-BRCKIM2Rrs1Do0xDOgVu
+     * @param location
+     */
     public void filter(BDLocation location){
+    	//把过滤的规则放这里第一个是为了计算两个点位之间的距离是不是对的
+    	if(location.getLocType()==BDLocation.TypeNetWorkLocation) {
+			//如果是网络定位，就使用上一次的gps定位结果,保持网络定位的原因是保持心跳反应
+			if(this.currentLongitude!=null) {
+				location.setLatitude(this.currentLatitude);
+				location.setLongitude(this.currentLongitude);
+				location.setRadius(this.currentRadius);
+				location.setLocType(BDLocation.TypeGpsLocation);
+			}
+		}
+    	
 		//对数据进行纠偏
 		if(location.getSpeed()==0){
 			// 速度为0时，强制方向为0；
@@ -239,21 +256,15 @@ public class LocationApplication extends Service{
 				location.setLatitude(this.currentLatitude);
 				location.setLongitude(this.currentLongitude);
 				location.setRadius(this.currentRadius);
+				location.setLocType(BDLocation.TypeGpsLocation);
 			}
 			
-		} else if(location.getLocType()==BDLocation.TypeGpsLocation){
-			//如果是网络定位，就使用上一次的gps定位结果,保持网络定位的原因是保持心跳反应
-			if(this.currentLongitude!=null){
-				location.setLatitude(this.currentLatitude);
-				location.setLongitude(this.currentLongitude);
-				location.setRadius(this.currentRadius);
-			}
-		}
+		}  
     }
     
     SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public void postCoords(BDLocation location) {
-    	MyLog.i(BaiduMapAll.LOG_TAG, "正在发送定位信息!");
+    	//MyLog.i(BaiduMapAll.LOG_TAG, "正在发送定位信息!");
     	//Log.i(BaiduMapAll.LOG_TAG, "11111111111111!!"+this.getUploadUrl());
     	//如果没有上传路径就不进行上传
     	if(this.getUploadUrl()==null || "".equals(this.getUploadUrl()) ){
@@ -313,7 +324,13 @@ public class LocationApplication extends Service{
 			nameValuePairs.add(new BasicNameValuePair("direction", location.getDirection()+""));
 			nameValuePairs.add(new BasicNameValuePair("speed", location.getSpeed()+""));
 			//nameValuePairs.add(new BasicNameValuePair("loc_time",location.getTime()));//不使用这个，因为百度会缓存金维度
-			nameValuePairs.add(new BasicNameValuePair("loc_type",(location.getLocType()==BDLocation.TypeGpsLocation?"gps":"network")));
+			String loc_type="gps";
+			if(location.getLocType()==BDLocation.TypeNetWorkLocation){
+				loc_type="network";
+			} else if(location.getLocType()==BDLocation.TypeOffLineLocation){
+				loc_type="offline";
+			}
+			nameValuePairs.add(new BasicNameValuePair("loc_type",loc_type));
 			nameValuePairs.add(new BasicNameValuePair("loc_time",format.format(loc_time)));//String，时间，ex:2010-01-01 14:01:01
 			nameValuePairs.add(new BasicNameValuePair("loc_time_interval",loc_time_interval+""));
 			nameValuePairs.add(new BasicNameValuePair("distance", distance+""));
@@ -420,13 +437,13 @@ public class LocationApplication extends Service{
 	@Override
 	 public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(BaiduMapAll.LOG_TAG, "启动LocationApplication!");
-		MyLog.i(BaiduMapAll.LOG_TAG, "启动LocationApplication!");
+		//MyLog.i(BaiduMapAll.LOG_TAG, "启动LocationApplication!");
 		
 		this.setUploadUrl(intent.getStringExtra("uploadUrl"));
 		this.setGps_interval(intent.getIntExtra("gps_interval",0));
 		String params_str=intent.getStringExtra("params");
-		MyLog.i(BaiduMapAll.LOG_TAG, "gps_interval:"+this.getGps_interval());
-		MyLog.i(BaiduMapAll.LOG_TAG, "uploadUrl:"+this.getUploadUrl());
+		//MyLog.i(BaiduMapAll.LOG_TAG, "gps_interval:"+this.getGps_interval());
+		//MyLog.i(BaiduMapAll.LOG_TAG, "uploadUrl:"+this.getUploadUrl());
 		try {
 			if(params_str!=null){
 				this.setParams(new JSONObject(params_str));
