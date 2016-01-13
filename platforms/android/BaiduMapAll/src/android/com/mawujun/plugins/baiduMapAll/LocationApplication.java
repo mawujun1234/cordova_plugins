@@ -273,6 +273,8 @@ public class LocationApplication extends Service{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+    	
+    	//如果当前获取的经纬度不是gps信息的话，就要判断是否要发送心跳信息了
     	if (location.getLocType() != BDLocation.TypeGpsLocation && location.getRadius()>need_radius) {
     		
     		heartbeat();
